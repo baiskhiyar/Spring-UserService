@@ -1,12 +1,16 @@
 package microservice.userService.models;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.time.LocalDateTime;
 
 @Entity
 @Data
-@Table(name = "users")
+@AllArgsConstructor
+@NoArgsConstructor
 public class Users {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-increment
@@ -54,10 +58,4 @@ public class Users {
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
-//
-//    @Override
-//    public void setPassword(String password){
-////       TODO : Need to add encryption
-//        this.password = "askljashduadhsfjkaldhf" + password + "alkjsdfpqowierojof";
-//    }
 }

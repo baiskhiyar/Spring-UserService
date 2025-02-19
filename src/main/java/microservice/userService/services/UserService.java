@@ -7,12 +7,11 @@ import microservice.userService.models.Users;
 import microservice.userService.repository.AccessTokenProviderRepository;
 import microservice.userService.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import microservice.userService.helpers.ScopesHelper;
 
-import java.sql.Time;
 import java.time.ZonedDateTime;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -34,6 +33,8 @@ public class UserService {
         if (checkIfUsernameTaken(user.getUsername())){
             throw new RuntimeException("Username already taken");
         }
+        String hashedPassword = generatePasswordHash(user.getPassword());
+        user.setPassword(hashedPassword);
         return userRepository.save(user);
     }
 
@@ -53,6 +54,8 @@ public class UserService {
         if (!existingUser.getUsername().equals(newUsername) && checkIfUsernameTaken(newUsername)){
             throw new RuntimeException("Username already taken");
         }
+        String hashedPassword = generatePasswordHash(userUpdateData.getPassword());
+        userUpdateData.setPassword(hashedPassword);
         existingUser.setPassword(userUpdateData.getPassword());
         existingUser.setFirstName(userUpdateData.getFirstName());
         existingUser.setLastName(userUpdateData.getLastName());
@@ -70,7 +73,7 @@ public class UserService {
             throw new RuntimeException("Username or password is missing!");
         }
         Users existingUser = userRepository.findByUsername(user.getUsername()).orElseThrow(() -> new RuntimeException("User not found!"));
-        if (!existingUser.getPassword().equals(user.getPassword())){
+        if (!validatePassword(user.getPassword(), existingUser.getPassword())){
             throw new RuntimeException("Invalid username or password!");
         }
         if (!existingUser.getActive()){
@@ -101,6 +104,16 @@ public class UserService {
     public String logoutUser(String authToken){
         accessTokenProviderHelper.expireAccessToken(authToken);
         return "Logged out successfully";
+    }
+
+    public String generatePasswordHash(String password){
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        return passwordEncoder.encode(password);
+    }
+
+    public boolean validatePassword(String password, String hashedPassword){
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        return passwordEncoder.matches(password, hashedPassword);
     }
 }
 

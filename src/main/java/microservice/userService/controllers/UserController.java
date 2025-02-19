@@ -11,27 +11,30 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
 
 @RestController
+//@CrossOrigin // This will allow calls from different origin CORS.
+// For example frontend is running on port A and backend is in port B.
+@RequestMapping("/spring/users")
 public class UserController {
 
     @Autowired
     private UserService userService;
 
-    @GetMapping("/spring/users/healthCheck")
+    @GetMapping("/healthCheck")
     public String getUserName() {
         return "UserService is up and running" ;
     }
 
-    @PostMapping("spring/users/register")
+    @PostMapping("/register") // TODO : starting slash missing. Check this
     public Users registerUser(@RequestBody Users user) {
         return userService.registerUser(user);
     }
 
-    @PutMapping("/spring/users/updateUser")
+    @PutMapping("/updateUser")
     public Users updateUser(@RequestBody Users user) {
         return userService.updateUserById(user.getId(), user);
     }
 
-    @GetMapping("/spring/users/getByUsername")
+    @GetMapping("/getByUsername")
     public ResponseEntity<?> getUserByUsername(@RequestParam("username") String username) {
         Optional<Users> user = userService.findByUsername(username);
         if (user.isPresent()) {
@@ -41,12 +44,12 @@ public class UserController {
         }
     }
 
-    @PostMapping("/spring/users/login")
+    @PostMapping("/login")
     public String loginUser(@RequestBody Users user) {
         return userService.loginUser(user);
     }
 
-    @DeleteMapping("/spring/users/logout")
+    @DeleteMapping("/logout")
     public  ResponseEntity<?> logoutUser(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) {
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
             return new ResponseEntity<>("Missing or invalid Authorization header", HttpStatus.BAD_REQUEST);
