@@ -1,35 +1,35 @@
 package microservice.userService.controllers;
 
+import jakarta.servlet.http.HttpServletRequest;
 import microservice.userService.models.Users;
 import microservice.userService.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
 @RestController
-//@CrossOrigin // This will allow calls from different origin CORS.
-// For example frontend is running on port A and backend is in port B.
-@RequestMapping("/spring/users")
+@RequestMapping("spring/users")
 public class UserController {
 
     @Autowired
     private UserService userService;
 
-    @GetMapping("/healthCheck")
+    @GetMapping("healthCheck")
     public String getUserName() {
         return "UserService is up and running" ;
     }
 
-    @PostMapping("/register") // TODO : starting slash missing. Check this
+    @PostMapping("register") // TODO : starting slash missing. Check this
     public Users registerUser(@RequestBody Users user) {
         return userService.registerUser(user);
     }
 
-    @PutMapping("/updateUser")
+    @PutMapping("updateUser")
     public Users updateUser(@RequestBody Users user) {
         return userService.updateUserById(user.getId(), user);
     }
@@ -44,12 +44,12 @@ public class UserController {
         }
     }
 
-    @PostMapping("/login")
+    @PostMapping("login")
     public String loginUser(@RequestBody Users user) {
         return userService.loginUser(user);
     }
 
-    @DeleteMapping("/logout")
+    @DeleteMapping("logout")
     public  ResponseEntity<?> logoutUser(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) {
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
             return new ResponseEntity<>("Missing or invalid Authorization header", HttpStatus.BAD_REQUEST);
@@ -57,5 +57,10 @@ public class UserController {
         String authToken = authorizationHeader.substring(7); // Removing "Bearer " from authorizationHeader.
         String response = userService.logoutUser(authToken);
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("csrf-token")
+    public CsrfToken getCsrfToken(HttpServletRequest request) {
+        return (CsrfToken) request.getAttribute(CsrfToken.class.getName());
     }
 }
