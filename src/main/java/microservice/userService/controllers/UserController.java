@@ -34,8 +34,8 @@ public class UserController {
         return userService.updateUserById(user.getId(), user);
     }
 
-    @GetMapping("/getByUsername")
-    public ResponseEntity<?> getUserByUsername(@RequestParam("username") String username) {
+    @GetMapping("/getByUsername/{username}")
+    public ResponseEntity<?> getUserByUsername(@PathVariable String username) {
         Optional<Users> user = userService.findByUsername(username);
         if (user.isPresent()) {
             return new ResponseEntity<>(user.get(), HttpStatus.OK);
