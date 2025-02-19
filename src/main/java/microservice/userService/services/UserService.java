@@ -13,6 +13,7 @@ import microservice.userService.helpers.ScopesHelper;
 
 import java.time.ZonedDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UserService {
@@ -87,7 +88,7 @@ public class UserService {
         if (userScopes.length == 0){
             throw new RuntimeException("User has no scopes!");
         }
-        String accessToken = CommonUtils.generateRandomString(25);
+        String accessToken = UUID.randomUUID().toString();
         ZonedDateTime expiresAt = TimeUtility.addDeltaToTime(
                 TimeUtility.getCurrentDateTime(), "month", 3
         );

@@ -4,14 +4,20 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.Collections;
 
 @Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Users {
+public class Users implements UserDetails
+{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-increment
     @Column(name = "id")
@@ -57,5 +63,11 @@ public class Users {
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+    //      TODO : This will add roles. Need to check the use case.
+        return Collections.singleton(new SimpleGrantedAuthority("USER"));
     }
 }

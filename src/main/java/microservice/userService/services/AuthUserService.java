@@ -21,7 +21,7 @@ public class AuthUserService implements UserDetailsService {
         UserRepository userRepository = this.userRepository;
         Optional<Users> user = userRepository.findByUsername(username);
         if (user.isPresent()) {
-            return new AuthUserPrincipleService(user.get());
+            return user.get();
         } else {
             throw new UsernameNotFoundException("User not found!");
         }
