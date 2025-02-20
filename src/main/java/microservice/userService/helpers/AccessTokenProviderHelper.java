@@ -13,7 +13,6 @@ public class AccessTokenProviderHelper {
     private AccessTokenProviderRepository accessTokenProviderRepository;
     @Transactional
     public void expireAccessToken(String accessToken){
-        LocalDateTime currentTime = TimeUtility.getCurrentDateTime();
-        accessTokenProviderRepository.expireToken(accessToken, currentTime);
+        accessTokenProviderRepository.deleteByAccessToken(accessToken);
     }
 }

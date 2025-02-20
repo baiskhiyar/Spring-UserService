@@ -1,13 +1,13 @@
 package microservice.userService.controllers;
 
 import jakarta.servlet.http.HttpServletRequest;
-import microservice.userService.config.RequiredScopes;
 import microservice.userService.models.Users;
 import microservice.userService.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,12 +31,13 @@ public class UserController {
     }
 
     @PutMapping("updateUser")
-    @RequiredScopes({"admin", "super-admin"})
+    @PreAuthorize("hasAnyAuthority('admin')")
     public Users updateUser(@RequestBody Users user) {
         return userService.updateUserById(user.getId(), user);
     }
 
     @GetMapping("/getByUsername/{username}")
+    @PreAuthorize("hasAnyAuthority('admin')")
     public ResponseEntity<?> getUserByUsername(@PathVariable String username) {
         Optional<Users> user = userService.findByUsername(username);
         if (user.isPresent()) {
@@ -52,6 +53,7 @@ public class UserController {
     }
 
     @DeleteMapping("logout")
+    @PreAuthorize("hasAnyAuthority('admin')")
     public  ResponseEntity<?> logoutUser(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) {
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
             return new ResponseEntity<>("Missing or invalid Authorization header", HttpStatus.BAD_REQUEST);
@@ -62,6 +64,7 @@ public class UserController {
     }
 
     @GetMapping("csrf-token")
+    @PreAuthorize("hasAnyAuthority('admin')")
     public CsrfToken getCsrfToken(HttpServletRequest request) {
         return (CsrfToken) request.getAttribute(CsrfToken.class.getName());
     }
