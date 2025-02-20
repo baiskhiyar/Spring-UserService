@@ -1,6 +1,5 @@
 package microservice.userService.services;
-import microservice.userService.helpers.AccessTokenProviderHelper;
-import microservice.userService.helpers.CommonUtils;
+import microservice.userService.config.AccessTokenProviderHelper;
 import microservice.userService.helpers.TimeUtility;
 import microservice.userService.models.AccessTokenProvider;
 import microservice.userService.models.Users;

@@ -1,5 +1,7 @@
-package microservice.userService.helpers;
+package microservice.userService.config;
 
+import microservice.userService.helpers.ScopesHelper;
+import microservice.userService.helpers.TimeUtility;
 import microservice.userService.models.AccessTokenProvider;
 import microservice.userService.models.Users;
 import microservice.userService.repository.AccessTokenProviderRepository;
@@ -23,6 +25,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+        System.out.println("inside CustomAuthenticationProvider authenticate");
         String token = (String) authentication.getCredentials();
 
         AccessTokenProvider accessToken = accessTokenRepository.findByAccessToken(token);

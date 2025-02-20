@@ -1,4 +1,4 @@
-package microservice.userService.helpers;
+package microservice.userService.config;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.context.annotation.Primary;

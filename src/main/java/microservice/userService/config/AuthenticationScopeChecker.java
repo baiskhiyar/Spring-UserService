@@ -1,7 +1,7 @@
-package microservice.userService.helpers;
+package microservice.userService.config;
 
 import jakarta.servlet.http.HttpServletRequest;
-import microservice.userService.config.RequiredScopes;
+import microservice.userService.helpers.ScopesHelper;
 import microservice.userService.models.Users;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.access.AccessDecisionVoter;

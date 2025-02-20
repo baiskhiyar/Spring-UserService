@@ -1,4 +1,5 @@
-package microservice.userService.helpers;
+package microservice.userService.config;
+import microservice.userService.helpers.TimeUtility;
 import microservice.userService.repository.AccessTokenProviderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
