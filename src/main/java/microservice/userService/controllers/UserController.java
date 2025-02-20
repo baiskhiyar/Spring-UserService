@@ -25,13 +25,13 @@ public class UserController {
         return "UserService is up and running" ;
     }
 
-    @PostMapping("register") // TODO : starting slash missing. Check this
+    @PostMapping("register")
     public Users registerUser(@RequestBody Users user) {
         return userService.registerUser(user);
     }
 
     @PutMapping("updateUser")
-    @PreAuthorize("hasAnyAuthority('admin')")
+    @PreAuthorize("hasAnyAuthority('admin', 'employee')")
     public Users updateUser(@RequestBody Users user) {
         return userService.updateUserById(user.getId(), user);
     }
