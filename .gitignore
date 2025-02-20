@@ -9,5 +9,5 @@
 *.jpeg
 *.gif          # GIF images
 *.pdf          # PDF documents
-/build/        # Entire build directory (common for Java projects)
-/target/       # Entire target directory (common for Java projects)
+build/        # Entire build directory (common for Java projects)
+target/       # Entire target directory (common for Java projects)
