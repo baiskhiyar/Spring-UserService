@@ -32,7 +32,7 @@ class BearerTokenAuthenticationProvider implements AuthenticationProvider {
 
         BearerTokenAuthentication auth = (BearerTokenAuthentication) authentication;
         String token = auth.getToken();
-
+        // Getting accessTokenProvider from the bearer token.
         AccessTokenProvider accessTokenProvider = accessTokenProviderRepository.findByAccessToken(token);
         if (accessTokenProvider == null) {
             return null;  // Or throw an AuthenticationException
@@ -40,15 +40,17 @@ class BearerTokenAuthenticationProvider implements AuthenticationProvider {
         if (accessTokenProvider.getExpiresAt().isBefore(LocalDateTime.now())) {
             return null; // Or throw an AuthenticationException
         }
+        // Getting user from the authToken
         Users user = userRepository.findById(accessTokenProvider.getUserId());
         if (user == null) {
             return null;  // Or throw an AuthenticationException
         }
+        // Adding users scopes into the authorities which will be used on api level @PreAuthorize
         String[] userScopes = ScopesHelper.parseScopes(accessTokenProvider.getAvailableScopes());
         List<SimpleGrantedAuthority> authorities = Arrays.stream(userScopes)
-                        .map(String::trim) // Trim whitespace, important!
-                        .map(SimpleGrantedAuthority::new)
-                        .toList();
+                .map(String::trim) // Trim whitespace, important!
+                .map(SimpleGrantedAuthority::new)
+                .toList();
         return new BearerTokenAuthentication(token, user, authorities);
     }
 
