@@ -20,18 +20,15 @@ class BearerTokenAuthenticationFilter extends OncePerRequestFilter {
     private BearerTokenAuthenticationProvider authenticationProvider;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException {
+    protected void doFilterInternal(
+            HttpServletRequest request, HttpServletResponse response, FilterChain filterChain
+    ) throws ServletException, IOException {
 
         String authorizationHeader = request.getHeader("Authorization");
-
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             String token = authorizationHeader.substring(7); // Remove "Bearer " prefix
-
             BearerTokenAuthentication authRequest = new BearerTokenAuthentication(token);
-
             Authentication authenticationResult = null;
-
             try {
                 authenticationResult = authenticationProvider.authenticate(authRequest);
             } catch (AuthenticationException e) {
@@ -39,12 +36,10 @@ class BearerTokenAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.clearContext();
                 throw e;
             }
-
             if (authenticationResult != null) {
                 SecurityContextHolder.getContext().setAuthentication(authenticationResult);
             }
         }
-
         filterChain.doFilter(request, response);
     }
 }

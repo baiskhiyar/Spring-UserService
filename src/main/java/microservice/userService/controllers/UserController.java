@@ -31,7 +31,7 @@ public class UserController {
     }
 
     @PutMapping("updateUser")
-    @PreAuthorize("hasAnyAuthority('admin', 'employee')")
+    @PreAuthorize("hasAnyAuthority('admin', 'create-user')")
     public Users updateUser(@RequestBody Users user) {
         return userService.updateUserById(user.getId(), user);
     }

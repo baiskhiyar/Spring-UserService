@@ -2,8 +2,6 @@ package microservice.userService.config;
 
 import microservice.userService.helpers.ScopesHelper;
 import microservice.userService.models.AccessTokenProvider;
-import microservice.userService.models.RoleScopes;
-import microservice.userService.models.UserRoles;
 import microservice.userService.models.Users;
 import microservice.userService.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 // Authentication Provider
 @Component
@@ -28,18 +25,6 @@ class BearerTokenAuthenticationProvider implements AuthenticationProvider {
 
     @Autowired
     private UserRepository userRepository;
-
-    @Autowired
-    private UserRolesRepository userRoleRepository;
-
-    @Autowired
-    private RolesRepository roleRepository;
-
-    @Autowired
-    private RoleScopesRepository roleScopesRepository;
-
-    @Autowired
-    private ScopesRepository scopeRepository;
 
     @Override
     @Transactional(readOnly = true) // Important for lazy loading issues
