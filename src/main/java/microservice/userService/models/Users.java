@@ -53,6 +53,9 @@ public class Users implements UserDetails
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @Transient // This field will NOT be a column in database
+    private String[] availableScopes;
+
     @PrePersist
     protected void onCreate() {
         active = true;

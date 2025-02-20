@@ -48,7 +48,10 @@ public class UserService {
             throw new RuntimeException("Missing userId in params!");
         }
 //      Checking if user exists with the given id.
-        Users existingUser = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found!"));
+        Users existingUser = userRepository.findById(userId);
+        if (existingUser == null){
+            throw new RuntimeException("User not found!");
+        }
         String newUsername = userUpdateData.getUsername();
 //      Checking if username is taken.
 //      TODO : Need to check username taken on product/level.

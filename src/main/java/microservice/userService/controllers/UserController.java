@@ -1,6 +1,7 @@
 package microservice.userService.controllers;
 
 import jakarta.servlet.http.HttpServletRequest;
+import microservice.userService.config.RequiredScopes;
 import microservice.userService.models.Users;
 import microservice.userService.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,7 @@ public class UserController {
     }
 
     @PutMapping("updateUser")
+    @RequiredScopes({"admin", "super-admin"})
     public Users updateUser(@RequestBody Users user) {
         return userService.updateUserById(user.getId(), user);
     }
