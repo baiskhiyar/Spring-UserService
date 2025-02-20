@@ -15,5 +15,7 @@ public interface AccessTokenProviderRepository extends JpaRepository<AccessToken
     @Modifying
     @Query("update AccessTokenProvider set expiresAt = :expiresAt where accessToken = :accessToken")
     void expireToken(@Param("accessToken") String token, @Param("expiresAt") LocalDateTime expiresAt);
+    AccessTokenProvider findByAccessToken(String accessToken);
+    void deleteByAccessToken(String accessToken);
 }
 

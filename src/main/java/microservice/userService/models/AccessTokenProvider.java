@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 public class AccessTokenProvider {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-increment
+    @Column(name = "id")
     private int id;
 
     @Column(name = "user_id", unique = true)
