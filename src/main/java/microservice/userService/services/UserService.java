@@ -13,6 +13,7 @@ import microservice.userService.helpers.ScopesHelper;
 import java.time.ZonedDateTime;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class UserService {
@@ -27,6 +28,9 @@ public class UserService {
     private ScopesHelper scopesHelper;
 
     @Autowired
+    private RedisService redisService;
+
+    @Autowired
     private AccessTokenProviderHelper accessTokenProviderHelper;
 
     public Users registerUser(Users user) {
@@ -38,8 +42,18 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public Optional<Users> findByUsername(String username) {
-        return userRepository.findByUsername(username);
+    public Users findByUsername(String username) {
+        String cacheKey = getUsernameCacheKey(username);
+        Users cachedUser = redisService.get(cacheKey, Users.class);
+        if (cachedUser == null) {
+            // Checking for cache miss
+            Optional<Users> user = userRepository.findByUsername(username);
+            if (user.isPresent()) {
+                cachedUser = user.get();
+                redisService.save(cacheKey, cachedUser, 30, TimeUnit.MINUTES);
+            }
+        }
+        return cachedUser;
     }
 
     public Users updateUserById(int userId, Users userUpdateData) {
@@ -117,6 +131,10 @@ public class UserService {
     public boolean validatePassword(String password, String hashedPassword){
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         return passwordEncoder.matches(password, hashedPassword);
+    }
+
+    public static String getUsernameCacheKey(String username){
+        return "user_by_username_" + username;
     }
 }
 
