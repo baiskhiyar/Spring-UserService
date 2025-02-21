@@ -119,7 +119,14 @@ public class UserService {
     }
 
     public String logoutUser(String authToken){
+        // TODO : No need to load accessTokenProvider and authUser. Get it from spring boot context itself.
+        AccessTokenProvider accessTokenProvider = accessTokenProviderRepository.findByAccessToken(authToken);
+        if (accessTokenProvider == null){
+            throw new RuntimeException("Invalid access token!");
+        }
+        Users user = userRepository.findById(accessTokenProvider.getUserId());
         accessTokenProviderHelper.expireAccessToken(authToken);
+        clearUserCache(user);
         return "Logged out successfully";
     }
 
@@ -133,8 +140,12 @@ public class UserService {
         return passwordEncoder.matches(password, hashedPassword);
     }
 
-    public static String getUsernameCacheKey(String username){
+    public String getUsernameCacheKey(String username){
         return "user_by_username_" + username;
+    }
+
+    public void clearUserCache(Users user){
+        redisService.delete(getUsernameCacheKey(user.getUsername()));
     }
 }
 
