@@ -1,0 +1,13 @@
+*.class        # Java compiled bytecode
+*.jar          # Java archives
+*.war          # Java web archives
+*.ear          # Java enterprise archives
+*.exe          # Windows executables
+*.dll          # Windows dynamic link libraries
+*.png          # PNG images
+*.jpg          # JPEG images
+*.jpeg
+*.gif          # GIF images
+*.pdf          # PDF documents
+/build/        # Entire build directory (common for Java projects)
+/target/       # Entire target directory (common for Java projects)

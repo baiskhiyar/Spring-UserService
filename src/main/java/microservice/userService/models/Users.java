@@ -1,13 +1,23 @@
 package microservice.userService.models;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.Collections;
 
 @Entity
 @Data
-@Table(name = "users")
-public class Users {
+@AllArgsConstructor
+@NoArgsConstructor
+public class Users implements UserDetails
+{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-increment
     @Column(name = "id")
@@ -43,6 +53,9 @@ public class Users {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @Transient // This field will NOT be a column in database
+    private String[] availableScopes;
+
     @PrePersist
     protected void onCreate() {
         active = true;
@@ -54,10 +67,10 @@ public class Users {
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
-//
-//    @Override
-//    public void setPassword(String password){
-////       TODO : Need to add encryption
-//        this.password = "askljashduadhsfjkaldhf" + password + "alkjsdfpqowierojof";
-//    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+    //      TODO : This will add roles. Need to check the use case.
+        return Collections.singleton(new SimpleGrantedAuthority("USER"));
+    }
 }

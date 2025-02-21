@@ -1,19 +1,18 @@
 package microservice.userService.services;
 import microservice.userService.helpers.AccessTokenProviderHelper;
-import microservice.userService.helpers.CommonUtils;
 import microservice.userService.helpers.TimeUtility;
 import microservice.userService.models.AccessTokenProvider;
 import microservice.userService.models.Users;
 import microservice.userService.repository.AccessTokenProviderRepository;
 import microservice.userService.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import microservice.userService.helpers.ScopesHelper;
 
-import java.sql.Time;
 import java.time.ZonedDateTime;
-import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UserService {
@@ -34,6 +33,8 @@ public class UserService {
         if (checkIfUsernameTaken(user.getUsername())){
             throw new RuntimeException("Username already taken");
         }
+        String hashedPassword = generatePasswordHash(user.getPassword());
+        user.setPassword(hashedPassword);
         return userRepository.save(user);
     }
 
@@ -46,13 +47,18 @@ public class UserService {
             throw new RuntimeException("Missing userId in params!");
         }
 //      Checking if user exists with the given id.
-        Users existingUser = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found!"));
+        Users existingUser = userRepository.findById(userId);
+        if (existingUser == null){
+            throw new RuntimeException("User not found!");
+        }
         String newUsername = userUpdateData.getUsername();
 //      Checking if username is taken.
 //      TODO : Need to check username taken on product/level.
         if (!existingUser.getUsername().equals(newUsername) && checkIfUsernameTaken(newUsername)){
             throw new RuntimeException("Username already taken");
         }
+        String hashedPassword = generatePasswordHash(userUpdateData.getPassword());
+        userUpdateData.setPassword(hashedPassword);
         existingUser.setPassword(userUpdateData.getPassword());
         existingUser.setFirstName(userUpdateData.getFirstName());
         existingUser.setLastName(userUpdateData.getLastName());
@@ -70,7 +76,7 @@ public class UserService {
             throw new RuntimeException("Username or password is missing!");
         }
         Users existingUser = userRepository.findByUsername(user.getUsername()).orElseThrow(() -> new RuntimeException("User not found!"));
-        if (!existingUser.getPassword().equals(user.getPassword())){
+        if (!validatePassword(user.getPassword(), existingUser.getPassword())){
             throw new RuntimeException("Invalid username or password!");
         }
         if (!existingUser.getActive()){
@@ -84,7 +90,7 @@ public class UserService {
         if (userScopes.length == 0){
             throw new RuntimeException("User has no scopes!");
         }
-        String accessToken = CommonUtils.generateRandomString(25);
+        String accessToken = UUID.randomUUID().toString();
         ZonedDateTime expiresAt = TimeUtility.addDeltaToTime(
                 TimeUtility.getCurrentDateTime(), "month", 3
         );
@@ -101,6 +107,16 @@ public class UserService {
     public String logoutUser(String authToken){
         accessTokenProviderHelper.expireAccessToken(authToken);
         return "Logged out successfully";
+    }
+
+    public String generatePasswordHash(String password){
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        return passwordEncoder.encode(password);
+    }
+
+    public boolean validatePassword(String password, String hashedPassword){
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        return passwordEncoder.matches(password, hashedPassword);
     }
 }
 
