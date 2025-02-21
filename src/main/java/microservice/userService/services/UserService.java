@@ -46,11 +46,23 @@ public class UserService {
         String cacheKey = getUsernameCacheKey(username);
         Users cachedUser = redisService.get(cacheKey, Users.class);
         if (cachedUser == null) {
-            // Checking for cache miss
             Optional<Users> user = userRepository.findByUsername(username);
             if (user.isPresent()) {
                 cachedUser = user.get();
                 redisService.save(cacheKey, cachedUser, 30, TimeUnit.MINUTES);
+            }
+        }
+        return cachedUser;
+    }
+
+    public Users findById(int userId){
+        String cacheKey = getUserByIdCacheKey(userId);
+        Users cachedUser = redisService.get(cacheKey, Users.class);
+        if (cachedUser == null){
+            Users user = userRepository.findById(userId);
+            if (user != null){
+                redisService.save(cacheKey, user, 30, TimeUnit.MINUTES);
+                cachedUser = user;
             }
         }
         return cachedUser;
@@ -144,8 +156,15 @@ public class UserService {
         return "user_by_username_" + username;
     }
 
+    public String getUserByIdCacheKey(int userId){
+        return "user_by_id_" + userId;
+    }
+
     public void clearUserCache(Users user){
-        redisService.delete(getUsernameCacheKey(user.getUsername()));
+        String[] cacheKeys = new String[]{getUsernameCacheKey(user.getUsername()), getUserByIdCacheKey(user.getId())};
+        for (String cacheKey : cacheKeys){
+            redisService.delete(cacheKey);
+        }
     }
 }
 

@@ -13,16 +13,12 @@ public class RedisService {
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
 
-    public <T> void save(String key, T value) {
-        redisTemplate.opsForValue().set(key, value);
-    }
-
     public <T> void save(String key, T value, long timeout, TimeUnit unit) {
-        redisTemplate.opsForValue().set(key, value, timeout, unit);
+        redisTemplate.opsForValue().set(getUserServiceCacheKey(key), value, timeout, unit);
     }
 
     public <T> T get(String key, Class<T> type) {
-        Object value = redisTemplate.opsForValue().get(key);
+        Object value = redisTemplate.opsForValue().get(getUserServiceCacheKey(key));
         if (value == null) {
             return null;
         }
@@ -36,18 +32,10 @@ public class RedisService {
     }
 
     public void delete(String key) {
-        redisTemplate.delete(key);
+        redisTemplate.delete(getUserServiceCacheKey(key));
     }
 
-    public boolean exists(String key) {
-        return redisTemplate.hasKey(key);
-    }
-
-    public void expire(String key, long timeout, TimeUnit unit) {
-        redisTemplate.expire(key, timeout, unit);
-    }
-
-    public Long increment(String key, long delta) {
-        return redisTemplate.opsForValue().increment(key, delta);
+    public String getUserServiceCacheKey(String key){
+        return "userService:" + key;
     }
 }

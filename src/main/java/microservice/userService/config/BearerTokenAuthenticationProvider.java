@@ -4,6 +4,7 @@ import microservice.userService.helpers.ScopesHelper;
 import microservice.userService.models.AccessTokenProvider;
 import microservice.userService.models.Users;
 import microservice.userService.repository.*;
+import microservice.userService.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
@@ -24,7 +25,7 @@ class BearerTokenAuthenticationProvider implements AuthenticationProvider {
     private AccessTokenProviderRepository accessTokenProviderRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    private UserService userService;
 
     @Override
     @Transactional(readOnly = true) // Important for lazy loading issues
@@ -41,7 +42,7 @@ class BearerTokenAuthenticationProvider implements AuthenticationProvider {
             return null; // Or throw an AuthenticationException
         }
         // Getting user from the authToken
-        Users user = userRepository.findById(accessTokenProvider.getUserId());
+        Users user = userService.findById(accessTokenProvider.getUserId());
         if (user == null) {
             return null;  // Or throw an AuthenticationException
         }

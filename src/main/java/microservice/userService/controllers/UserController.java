@@ -11,8 +11,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
-
 @RestController
 @RequestMapping("spring/users")
 public class UserController {
