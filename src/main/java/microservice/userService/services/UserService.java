@@ -1,4 +1,5 @@
 package microservice.userService.services;
+import microservice.userService.helpers.CommonUtils;
 import microservice.userService.models.AccessTokenProvider;
 import microservice.userService.models.Users;
 import microservice.userService.helpers.AccessTokenProviderHelper;
@@ -131,12 +132,10 @@ public class UserService {
     }
 
     public String logoutUser(String authToken){
-        // TODO : No need to load accessTokenProvider and authUser. Get it from spring boot context itself.
-        AccessTokenProvider accessTokenProvider = accessTokenProviderRepository.findByAccessToken(authToken);
-        if (accessTokenProvider == null){
-            throw new RuntimeException("Invalid access token!");
+        Users user = CommonUtils.getCurrentUser();
+        if (user == null){
+            throw new RuntimeException("User not found!");
         }
-        Users user = userRepository.findById(accessTokenProvider.getUserId());
         accessTokenProviderHelper.expireAccessToken(authToken);
         clearUserCache(user);
         return "Logged out successfully";

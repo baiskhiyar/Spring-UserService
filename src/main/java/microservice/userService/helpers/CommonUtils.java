@@ -1,5 +1,9 @@
 package microservice.userService.helpers;
 
+import microservice.userService.models.Users;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+
 import java.util.Random;
 
 public class CommonUtils {
@@ -14,5 +18,14 @@ public class CommonUtils {
             sb.append(characters.charAt(randomIndex));
         }
         return sb.toString();
+    }
+
+    public static Users getCurrentUser(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()) {
+            return (Users) authentication.getPrincipal();
+        } else {
+            return null;
+        }
     }
 }
