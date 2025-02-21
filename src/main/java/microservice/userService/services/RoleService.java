@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 
 
 @Service
-public class roleService {
+public class RoleService {
     @Autowired
     private RolesRepository rolesRepository;
 

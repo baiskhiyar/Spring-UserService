@@ -10,6 +10,6 @@ import org.springframework.stereotype.Repository;
 public interface UserRolesRepository extends JpaRepository<UserRoles, Long> {
 
     @Query("SELECT ur.roleId FROM UserRoles ur WHERE ur.userId = :userId")
-    int[] fetchRoleIdsForUser (@Param("userId") int userId);
+    int[] getRoleIdsForUser (@Param("userId") int userId);
 }
 
