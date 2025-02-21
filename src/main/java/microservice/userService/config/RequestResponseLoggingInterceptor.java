@@ -24,7 +24,7 @@ public class RequestResponseLoggingInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        // Log the request details
+        // Log the request details before going to the controller.
         ContentCachingRequestWrapper requestWrapper = new ContentCachingRequestWrapper(request);
         logRequest(requestWrapper);
         return true;
@@ -32,7 +32,7 @@ public class RequestResponseLoggingInterceptor implements HandlerInterceptor {
 
     @Override
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
-        // Log the response details
+        // Log the response details after the controller returns a response.
         ContentCachingResponseWrapper responseWrapper = new ContentCachingResponseWrapper(response);
         logResponse(responseWrapper, request);
         responseWrapper.copyBodyToResponse(); // Copy the cached response body to the actual response
