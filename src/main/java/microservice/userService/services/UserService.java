@@ -1,8 +1,8 @@
 package microservice.userService.services;
-import microservice.userService.helpers.AccessTokenProviderHelper;
-import microservice.userService.helpers.TimeUtility;
 import microservice.userService.models.AccessTokenProvider;
 import microservice.userService.models.Users;
+import microservice.userService.helpers.AccessTokenProviderHelper;
+import microservice.userService.helpers.TimeUtility;
 import microservice.userService.repository.AccessTokenProviderRepository;
 import microservice.userService.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
