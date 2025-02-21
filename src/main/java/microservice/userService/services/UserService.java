@@ -16,6 +16,9 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Service
 public class UserService {
 
@@ -34,9 +37,13 @@ public class UserService {
     @Autowired
     private AccessTokenProviderHelper accessTokenProviderHelper;
 
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
+
     public Users registerUser(Users user) {
         if (checkIfUsernameTaken(user.getUsername())){
-            throw new RuntimeException("Username already taken");
+            String errMsg = "Username is already taken";
+            logger.error(errMsg);
+            throw new RuntimeException(errMsg);
         }
         String hashedPassword = generatePasswordHash(user.getPassword());
         user.setPassword(hashedPassword);
@@ -44,6 +51,7 @@ public class UserService {
     }
 
     public Users findByUsername(String username) {
+
         String cacheKey = getUsernameCacheKey(username);
         Users cachedUser = redisService.get(cacheKey, Users.class);
         if (cachedUser == null) {
@@ -71,16 +79,15 @@ public class UserService {
 
     public Users updateUserById(int userId, Users userUpdateData) {
         if (userId == 0){
-            throw new RuntimeException("Missing userId in params!");
+            String errMsg = "Missing userId in params!";
+            logger.error(errMsg);
+            throw new RuntimeException(errMsg);
         }
-//      Checking if user exists with the given id.
         Users existingUser = userRepository.findById(userId);
         if (existingUser == null){
             throw new RuntimeException("User not found!");
         }
         String newUsername = userUpdateData.getUsername();
-//      Checking if username is taken.
-//      TODO : Need to check username taken on product/level.
         if (!existingUser.getUsername().equals(newUsername) && checkIfUsernameTaken(newUsername)){
             throw new RuntimeException("Username already taken");
         }

@@ -4,6 +4,8 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -18,6 +20,8 @@ class BearerTokenAuthenticationFilter extends OncePerRequestFilter {
 
     @Autowired
     private BearerTokenAuthenticationProvider authenticationProvider;
+
+    private static final Logger logger = LoggerFactory.getLogger(BearerTokenAuthenticationFilter.class);
 
     @Override
     protected void doFilterInternal(
@@ -34,22 +38,21 @@ class BearerTokenAuthenticationFilter extends OncePerRequestFilter {
                 Authentication authenticationResult = authenticationProvider.authenticate(authRequest);
                 // Now token is authenticated, Token, Users object and authorities that is available scopes is mapped.
                 if (authenticationResult == null) {
-                    // TODO : Log this
-                    System.out.println("Authentication Failed");
+                    logger.error("Authentication Failed");
                 } else {
                     // Now it will check the intersection of required vs available scopes for the api getting called.
                     // Setting authUser and scopes in the context which will be available throughout the api request
                     // journey.
                     SecurityContextHolder.getContext().setAuthentication(authenticationResult);
                 }
-                // TODO : Add else condition and log it.
             } catch (AuthenticationException e) {
-                // Handle authentication failure (e.g., log, return error response)
                 SecurityContextHolder.clearContext();
+                logger.error(e.getMessage());
                 throw e;
             }
+        } else {
+            logger.warn("Authorization header is missing");
         }
-        // TODO : Add else condition where we will log that bearer token is missing in the request.
         filterChain.doFilter(request, response);
     }
 }
