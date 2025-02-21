@@ -39,9 +39,9 @@ public class UserController {
     @GetMapping("/getByUsername/{username}")
     @PreAuthorize("hasAnyAuthority('admin')")
     public ResponseEntity<?> getUserByUsername(@PathVariable String username) {
-        Optional<Users> user = userService.findByUsername(username);
-        if (user.isPresent()) {
-            return new ResponseEntity<>(user.get(), HttpStatus.OK);
+        Users user = userService.findByUsername(username);
+        if (user != null) {
+            return new ResponseEntity<>(user, HttpStatus.OK);
         } else {
             return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
         }
