@@ -25,8 +25,8 @@ public class SecurityConfig {
             .csrf(AbstractHttpConfigurer::disable)  // Disable CSRF for API
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) //  no sessions
             .authorizeHttpRequests(auth -> auth
-                    .requestMatchers("/spring/users/register").permitAll() // Example:  allow public access
-                    .requestMatchers("/spring/users/login").permitAll()
+                    .requestMatchers("/spring/userService/register").permitAll() // Example:  allow public access
+                    .requestMatchers("/spring/userService/login").permitAll()
                     .anyRequest().authenticated() // Requires authentication for all other requests
             )
             .addFilterBefore(bearerTokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // Add filter

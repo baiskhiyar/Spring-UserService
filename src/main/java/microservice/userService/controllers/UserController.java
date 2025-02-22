@@ -12,7 +12,7 @@ import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("spring/users")
+@RequestMapping("spring/userService")
 public class UserController {
 
     @Autowired
@@ -34,10 +34,21 @@ public class UserController {
         return userService.updateUserById(user.getId(), user);
     }
 
-    @GetMapping("/getByUsername/{username}")
+    @GetMapping("getByUsername/{username}")
     @PreAuthorize("hasAnyAuthority('admin')")
     public ResponseEntity<?> getUserByUsername(@PathVariable String username) {
         Users user = userService.findByUsername(username);
+        if (user != null) {
+            return new ResponseEntity<>(user, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping("getUser/{userId}")
+//    @PreAuthorize("hasAnyAuthority('admin')")
+    public ResponseEntity<?> getUserById(@PathVariable Integer userId) {
+        Users user = userService.findById(userId);
         if (user != null) {
             return new ResponseEntity<>(user, HttpStatus.OK);
         } else {
