@@ -100,6 +100,13 @@ public class UserService {
         accessTokenProvider.setAvailableScopes(String.join(",", userScopes));
 //      Converting to localDateTimeZone and setting it to expiresAt
         accessTokenProvider.setExpiresAt(expiresAt.toLocalDateTime());
+        if(accessTokenProviderRepository.findByUserId(user.getId()).isPresent())
+        {
+            Optional<AccessTokenProvider> accessTokenProvider1 = accessTokenProviderRepository.findByUserId(user.getId());
+            String token = accessTokenProvider1.get().getAccessToken();
+            accessTokenProviderHelper.expireAccessToken(token);
+            //accessTokenProviderRepository.deleteByAccessToken(accessTokenProvider1.get().getAccessToken());
+        }
         accessTokenProviderRepository.save(accessTokenProvider);
         return accessToken;
     }

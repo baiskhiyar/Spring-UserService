@@ -1,6 +1,7 @@
 package microservice.userService.repository;
 
 import microservice.userService.models.AccessTokenProvider;
+import microservice.userService.models.Scopes;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -8,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Repository
 public interface AccessTokenProviderRepository extends JpaRepository<AccessTokenProvider, Long> {
@@ -16,6 +18,8 @@ public interface AccessTokenProviderRepository extends JpaRepository<AccessToken
     @Query("update AccessTokenProvider set expiresAt = :expiresAt where accessToken = :accessToken")
     void expireToken(@Param("accessToken") String token, @Param("expiresAt") LocalDateTime expiresAt);
     AccessTokenProvider findByAccessToken(String accessToken);
+    Optional<AccessTokenProvider> findByUserId(int userId);
     void deleteByAccessToken(String accessToken);
+    void deleteByUserId(int userId);
 }
 

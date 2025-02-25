@@ -10,7 +10,7 @@ public class RoleService {
     @Autowired
     private RolesRepository rolesRepository;
 
-    public Roles addScope(Roles role){
+    public Roles addRole(Roles role){
         if (checkIfScopeAlreadyAdded(role.getName())){
             throw new RuntimeException("Scope already Added");
         }
@@ -18,6 +18,6 @@ public class RoleService {
     }
 
     public boolean checkIfScopeAlreadyAdded(String name){
-        return rolesRepository.findByUsername(name).isPresent();
+        return rolesRepository.findByName(name).isPresent();
     }
 }

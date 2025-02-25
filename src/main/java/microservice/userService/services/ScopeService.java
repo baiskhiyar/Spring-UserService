@@ -19,7 +19,7 @@ public class ScopeService {
     }
 
     public boolean checkIfScopeAlreadyAdded(String name){
-        return scopesRepository.findByUsername(name).isPresent();
+        return scopesRepository.findByName(name).isPresent();
     }
 
 }
