@@ -1,8 +1,9 @@
 package microservice.userService.services;
-import microservice.userService.helpers.AccessTokenProviderHelper;
-import microservice.userService.helpers.TimeUtility;
+import microservice.userService.helpers.CommonUtils;
 import microservice.userService.models.AccessTokenProvider;
 import microservice.userService.models.Users;
+import microservice.userService.helpers.AccessTokenProviderHelper;
+import microservice.userService.helpers.TimeUtility;
 import microservice.userService.repository.AccessTokenProviderRepository;
 import microservice.userService.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,10 @@ import microservice.userService.helpers.ScopesHelper;
 import java.time.ZonedDateTime;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 public class UserService {
@@ -27,33 +32,62 @@ public class UserService {
     private ScopesHelper scopesHelper;
 
     @Autowired
+    private RedisService redisService;
+
+    @Autowired
     private AccessTokenProviderHelper accessTokenProviderHelper;
+
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
     public Users registerUser(Users user) {
         if (checkIfUsernameTaken(user.getUsername())){
-            throw new RuntimeException("Username already taken");
+            String errMsg = "Username is already taken";
+            logger.error(errMsg);
+            throw new RuntimeException(errMsg);
         }
         String hashedPassword = generatePasswordHash(user.getPassword());
         user.setPassword(hashedPassword);
         return userRepository.save(user);
     }
 
-    public Optional<Users> findByUsername(String username) {
-        return userRepository.findByUsername(username);
+    public Users findByUsername(String username) {
+
+        String cacheKey = getUsernameCacheKey(username);
+        Users cachedUser = redisService.get(cacheKey, Users.class);
+        if (cachedUser == null) {
+            Optional<Users> user = userRepository.findByUsername(username);
+            if (user.isPresent()) {
+                cachedUser = user.get();
+                redisService.save(cacheKey, cachedUser, 30, TimeUnit.MINUTES);
+            }
+        }
+        return cachedUser;
+    }
+
+    public Users findById(int userId){
+        String cacheKey = getUserByIdCacheKey(userId);
+        Users cachedUser = redisService.get(cacheKey, Users.class);
+        if (cachedUser == null){
+            Users user = userRepository.findById(userId);
+            if (user != null){
+                redisService.save(cacheKey, user, 30, TimeUnit.MINUTES);
+                cachedUser = user;
+            }
+        }
+        return cachedUser;
     }
 
     public Users updateUserById(int userId, Users userUpdateData) {
         if (userId == 0){
-            throw new RuntimeException("Missing userId in params!");
+            String errMsg = "Missing userId in params!";
+            logger.error(errMsg);
+            throw new RuntimeException(errMsg);
         }
-//      Checking if user exists with the given id.
         Users existingUser = userRepository.findById(userId);
         if (existingUser == null){
             throw new RuntimeException("User not found!");
         }
         String newUsername = userUpdateData.getUsername();
-//      Checking if username is taken.
-//      TODO : Need to check username taken on product/level.
         if (!existingUser.getUsername().equals(newUsername) && checkIfUsernameTaken(newUsername)){
             throw new RuntimeException("Username already taken");
         }
@@ -112,7 +146,12 @@ public class UserService {
     }
 
     public String logoutUser(String authToken){
+        Users user = CommonUtils.getCurrentUser();
+        if (user == null){
+            throw new RuntimeException("User not found!");
+        }
         accessTokenProviderHelper.expireAccessToken(authToken);
+        clearUserCache(user);
         return "Logged out successfully";
     }
 
@@ -124,6 +163,21 @@ public class UserService {
     public boolean validatePassword(String password, String hashedPassword){
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         return passwordEncoder.matches(password, hashedPassword);
+    }
+
+    public String getUsernameCacheKey(String username){
+        return "user_by_username_" + username;
+    }
+
+    public String getUserByIdCacheKey(int userId){
+        return "user_by_id_" + userId;
+    }
+
+    public void clearUserCache(Users user){
+        String[] cacheKeys = new String[]{getUsernameCacheKey(user.getUsername()), getUserByIdCacheKey(user.getId())};
+        for (String cacheKey : cacheKeys){
+            redisService.delete(cacheKey);
+        }
     }
 }
 

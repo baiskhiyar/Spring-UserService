@@ -22,14 +22,14 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable)  // Disable CSRF for API
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) //  no sessions
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/spring/users/register").permitAll() // Example:  allow public access
-                        .requestMatchers("/spring/users/login").permitAll()
-                        .anyRequest().authenticated() // Requires authentication for all other requests
-                )
-                .addFilterBefore(bearerTokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // Add filter
+            .csrf(AbstractHttpConfigurer::disable)  // Disable CSRF for API
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) //  no sessions
+            .authorizeHttpRequests(auth -> auth
+                    .requestMatchers("/spring/userService/register").permitAll() // Example:  allow public access
+                    .requestMatchers("/spring/userService/login").permitAll()
+                    .anyRequest().authenticated() // Requires authentication for all other requests
+            )
+            .addFilterBefore(bearerTokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // Add filter
         return http.build();
     }
 }

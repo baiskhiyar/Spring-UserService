@@ -13,6 +13,7 @@ class BearerTokenAuthentication extends AbstractAuthenticationToken {
 
     public BearerTokenAuthentication(String token) {
         super(null);
+        // Just setting the bearer token. Right now it is not authorised.
         this.token = token;
         setAuthenticated(false); // Initially not authenticated
     }
@@ -23,7 +24,6 @@ class BearerTokenAuthentication extends AbstractAuthenticationToken {
         this.user = user;
         setAuthenticated(true); // Authenticated
     }
-
 
     @Override
     public Object getCredentials() {
