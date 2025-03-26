@@ -62,7 +62,6 @@ public class UserController {
     }
 
     @DeleteMapping("logout")
-    @PreAuthorize("hasAnyAuthority('admin')")
     public  ResponseEntity<?> logoutUser(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) {
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
             return new ResponseEntity<>("Missing or invalid Authorization header", HttpStatus.BAD_REQUEST);

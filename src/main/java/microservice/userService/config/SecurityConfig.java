@@ -27,6 +27,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                     .requestMatchers("/spring/userService/register").permitAll() // Example:  allow public access
                     .requestMatchers("/spring/userService/login").permitAll()
+                    .requestMatchers("/spring/userService/healthCheck").permitAll()
                     .anyRequest().authenticated() // Requires authentication for all other requests
             )
             .addFilterBefore(bearerTokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // Add filter
