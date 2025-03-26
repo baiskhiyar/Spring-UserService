@@ -34,6 +34,7 @@ class BearerTokenAuthenticationProvider implements AuthenticationProvider {
     @Transactional(readOnly = true) // Important for lazy loading issues
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
 
+        // Typecasting authentication to our custom BearerTokenAuthentication object.
         BearerTokenAuthentication auth = (BearerTokenAuthentication) authentication;
         String token = auth.getToken();
         // Getting accessTokenProvider from the bearer token.
